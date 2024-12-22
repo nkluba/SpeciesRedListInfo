@@ -10,6 +10,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.SeekBar;
+import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -19,6 +21,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileWriter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,16 +55,17 @@ public class MainActivity extends AppCompatActivity {
         speciesInfoTable = findViewById(R.id.speciesInfoTable);
         fontSizeSeekBar = findViewById(R.id.fontSizeSeekBar);
         darkModeSwitch = findViewById(R.id.darkModeSwitch);
+        Button saveButton = findViewById(R.id.saveButton);
 
-        // Load saved dark mode preference
+        // Prepare Dark Mode Toggle
         boolean isDarkModeEnabled = getPreferences(MODE_PRIVATE).getBoolean("dark_mode", false);
-        darkModeSwitch.setChecked(isDarkModeEnabled); // Set the initial state of the switch
-        setDarkMode(isDarkModeEnabled); // Apply the saved theme
+        darkModeSwitch.setChecked(isDarkModeEnabled);
+        setDarkMode(isDarkModeEnabled);
 
-        // Set up fetch button click listener
+        // Set event listeners
         fetchButton.setOnClickListener(v -> fetchSpeciesInfo());
+        saveButton.setOnClickListener(v -> saveJsonData());
 
-        // Set SeekBar listener for font size adjustment
         fontSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -67,28 +73,49 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // Optional: Behavior for the user starting SeekBar adjustment
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // Optional: Behavior for the user finishing SeekBar adjustment
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        // Set default font size based on progress from SeekBar
+        // Set default font size
         adjustFontSize(fontSizeSeekBar.getProgress());
-
-        // Set up Dark Mode toggle
-        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Save user preference
-            getPreferences(MODE_PRIVATE).edit().putBoolean("dark_mode", isChecked).apply();
-
-            // Apply Dark/Light mode
-            setDarkMode(isChecked);
-        });
     }
+
+    /**
+     * Save the fetched JSON response to a file in the external storage.
+     */
+    private void saveJsonData() {
+        new Thread(() -> {
+            try {
+                // Retrieve data from the last fetched Species Info
+                String speciesName = speciesInput.getText().toString().trim();
+                String result = DataFetcher.fetchSpeciesInfo(speciesName);
+
+                if (result != null && !result.isEmpty()) {
+                    // Parse and save the JSON response
+                    JSONObject jsonResponse = new JSONObject(result);
+
+                    // Save the JSON response to a file
+                    File file = new File(getExternalFilesDir(null), "species_info.json");
+                    try (FileWriter writer = new FileWriter(file)) {
+                        writer.write(jsonResponse.toString(4)); // Write JSON data with indentation
+                    }
+
+                    // Provide feedback to the user
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "JSON saved: " + file.getAbsolutePath(), Toast.LENGTH_LONG).show());
+                } else {
+                    // Handle empty response
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "No data to save!", Toast.LENGTH_SHORT).show());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to save JSON: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
 
     /**
      * Applies Dark Mode or Light Mode depending on the user's choice.
