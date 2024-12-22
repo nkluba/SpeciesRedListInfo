@@ -34,15 +34,16 @@
     <!-- TableLayout for Displaying Species Info -->
     <TableLayout
         android:id="@+id/speciesInfoTable"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="1"
         android:stretchColumns="1"
         android:padding="12dp"
-        android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/fetchButton"
         app:layout_constraintBottom_toTopOf="@id/saveButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+    </TableLayout>
 
     <!-- Save JSON Button -->
     <Button

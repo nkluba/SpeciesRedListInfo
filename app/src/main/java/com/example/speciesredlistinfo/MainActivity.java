@@ -146,17 +146,25 @@ public class MainActivity extends AppCompatActivity {
     private void addRowToTable(String label, String value) {
         TableRow row = new TableRow(this);
 
+        // Create the label TextView (left column)
         TextView labelView = new TextView(this);
         labelView.setText(label);
         labelView.setTextSize(16);
         labelView.setPadding(8, 8, 8, 8);
+        labelView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)); // Use weight-based layout
+        labelView.setSingleLine(false); // Enable text wrapping
+        labelView.setEllipsize(null); // Disable ellipsis (truncation)
 
+        // Create the value TextView (right column)
         TextView valueView = new TextView(this);
         valueView.setText(value);
         valueView.setTextSize(16);
         valueView.setPadding(8, 8, 8, 8);
+        valueView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f)); // Use weight-based layout
+        valueView.setSingleLine(false); // Enable text wrapping for long text
+        valueView.setEllipsize(null); // Disable ellipsis (truncation)
 
-        // Add label and value to the row
+        // Add the label and value TextViews to the row
         row.addView(labelView);
         row.addView(valueView);
 
