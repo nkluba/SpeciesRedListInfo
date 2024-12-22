@@ -1,6 +1,7 @@
 package com.example.speciesredlistinfo;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
         fetchButton.setOnClickListener(v -> fetchSpeciesInfo());
     }
 
+    private String cleanHtml(String rawHtml) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            return Html.fromHtml(rawHtml, Html.FROM_HTML_MODE_LEGACY).toString().trim();
+        } else {
+            return Html.fromHtml(rawHtml).toString().trim();
+        }
+    }
+
     /**
      * Fetch and display species information based on user input.
      */
@@ -84,17 +93,17 @@ public class MainActivity extends AppCompatActivity {
                     if (resultsArray != null && resultsArray.length() > 0) {
                         JSONObject details = resultsArray.getJSONObject(0);
 
-                        // Extract the required fields from "details"
-                        String populationTrend = details.optString("populationtrend", "N/A");
-                        String rationale = details.optString("rationale", "N/A");
-                        String geographicRange = details.optString("geographicrange", "N/A");
-                        String habitat = details.optString("habitat", "N/A");
-                        String threats = details.optString("threats", "N/A");
-                        String conservationMeasures = details.optString("conservationmeasures", "N/A");
+                        // Extract the required fields from "details", clean HTML from each field
+                        String populationTrend = cleanHtml(details.optString("populationtrend", "N/A"));
+                        String rationale = cleanHtml(details.optString("rationale", "N/A"));
+                        String geographicRange = cleanHtml(details.optString("geographicrange", "N/A"));
+                        String habitat = cleanHtml(details.optString("habitat", "N/A"));
+                        String threats = cleanHtml(details.optString("threats", "N/A"));
+                        String conservationMeasures = cleanHtml(details.optString("conservationmeasures", "N/A"));
 
-                        // Update the UI with parsed data
+                        // Update the UI with parsed and cleaned data
                         runOnUiThread(() -> {
-                            clearTable(); // Clear any previous content
+                            clearTable(); // Clear existing rows
                             addRowToTable("Name", name);
                             addRowToTable("Population Trend", populationTrend);
                             addRowToTable("Rationale", rationale);
