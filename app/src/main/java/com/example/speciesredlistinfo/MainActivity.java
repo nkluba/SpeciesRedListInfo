@@ -5,12 +5,14 @@ import android.text.Html;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import androidx.appcompat.widget.SwitchCompat;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.SeekBar;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private Button fetchButton;
     private TableLayout speciesInfoTable;
     private SeekBar fontSizeSeekBar;
+    private SwitchCompat darkModeSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,30 +49,58 @@ public class MainActivity extends AppCompatActivity {
         fetchButton = findViewById(R.id.fetchButton);
         speciesInfoTable = findViewById(R.id.speciesInfoTable);
         fontSizeSeekBar = findViewById(R.id.fontSizeSeekBar);
+        darkModeSwitch = findViewById(R.id.darkModeSwitch);
 
-        // Set ClickListener for fetching species info
+        // Load saved dark mode preference
+        boolean isDarkModeEnabled = getPreferences(MODE_PRIVATE).getBoolean("dark_mode", false);
+        darkModeSwitch.setChecked(isDarkModeEnabled); // Set the initial state of the switch
+        setDarkMode(isDarkModeEnabled); // Apply the saved theme
+
+        // Set up fetch button click listener
         fetchButton.setOnClickListener(v -> fetchSpeciesInfo());
 
         // Set SeekBar listener for font size adjustment
         fontSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                adjustFontSize(progress); // Dynamically adjust font size in the table
+                adjustFontSize(progress);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // Optional: Add special behavior when the user starts adjusting (not used for now)
+                // Optional: Behavior for the user starting SeekBar adjustment
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // Optional: Add special behavior when the user stops adjusting (not used for now)
+                // Optional: Behavior for the user finishing SeekBar adjustment
             }
         });
 
-        // Set the default font size based on the SeekBar's initial value
+        // Set default font size based on progress from SeekBar
         adjustFontSize(fontSizeSeekBar.getProgress());
+
+        // Set up Dark Mode toggle
+        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Save user preference
+            getPreferences(MODE_PRIVATE).edit().putBoolean("dark_mode", isChecked).apply();
+
+            // Apply Dark/Light mode
+            setDarkMode(isChecked);
+        });
+    }
+
+    /**
+     * Applies Dark Mode or Light Mode depending on the user's choice.
+     *
+     * @param isEnabled true if Dark Mode should be enabled, false otherwise.
+     */
+    private void setDarkMode(boolean isEnabled) {
+        if (isEnabled) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     private String cleanHtml(String rawHtml) {
