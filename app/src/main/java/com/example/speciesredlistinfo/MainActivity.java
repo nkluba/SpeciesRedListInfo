@@ -8,7 +8,7 @@ import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
+import android.widget.SeekBar;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -26,12 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText speciesInput;
     private Button fetchButton;
     private TableLayout speciesInfoTable;
+    private SeekBar fontSizeSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Set gesture insets and layout
+        // Enable edge-to-edge layout and apply system insets
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -44,9 +45,31 @@ public class MainActivity extends AppCompatActivity {
         speciesInput = findViewById(R.id.speciesInput);
         fetchButton = findViewById(R.id.fetchButton);
         speciesInfoTable = findViewById(R.id.speciesInfoTable);
+        fontSizeSeekBar = findViewById(R.id.fontSizeSeekBar);
 
-        // Set event listener for fetch button
+        // Set ClickListener for fetching species info
         fetchButton.setOnClickListener(v -> fetchSpeciesInfo());
+
+        // Set SeekBar listener for font size adjustment
+        fontSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                adjustFontSize(progress); // Dynamically adjust font size in the table
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Optional: Add special behavior when the user starts adjusting (not used for now)
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Optional: Add special behavior when the user stops adjusting (not used for now)
+            }
+        });
+
+        // Set the default font size based on the SeekBar's initial value
+        adjustFontSize(fontSizeSeekBar.getProgress());
     }
 
     private String cleanHtml(String rawHtml) {
@@ -54,6 +77,25 @@ public class MainActivity extends AppCompatActivity {
             return Html.fromHtml(rawHtml, Html.FROM_HTML_MODE_LEGACY).toString().trim();
         } else {
             return Html.fromHtml(rawHtml).toString().trim();
+        }
+    }
+
+    /**
+     * Adjusts the font size of all rows in the TableLayout based on the provided size.
+     *
+     * @param fontSize The size to set for the font.
+     */
+    private void adjustFontSize(int fontSize) {
+        for (int i = 0; i < speciesInfoTable.getChildCount(); i++) {
+            TableRow row = (TableRow) speciesInfoTable.getChildAt(i);
+
+            for (int j = 0; j < row.getChildCount(); j++) {
+                // Only update TextView elements
+                if (row.getChildAt(j) instanceof TextView) {
+                    TextView textView = (TextView) row.getChildAt(j);
+                    textView.setTextSize(fontSize); // Adjust font size dynamically
+                }
+            }
         }
     }
 
