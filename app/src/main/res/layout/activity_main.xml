@@ -15,9 +15,11 @@
         android:layout_height="wrap_content"
         android:hint="Enter Scientific Name"
         android:padding="12dp"
+        android:inputType="textCapWords"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
 
     <!-- Fetch Info Button -->
     <Button
@@ -27,28 +29,20 @@
         android:text="Fetch Info"
         app:layout_constraintTop_toBottomOf="@id/speciesInput"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ScrollView (Encapsulates TextView for Output) -->
-    <ScrollView
-        android:id="@+id/scrollView"
+    <!-- TableLayout for Displaying Species Info -->
+    <TableLayout
+        android:id="@+id/speciesInfoTable"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:stretchColumns="1"
         android:padding="12dp"
+        android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/fetchButton"
         app:layout_constraintBottom_toTopOf="@id/saveButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Content TextView -->
-        <TextView
-            android:id="@+id/speciesInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Species info will be displayed here"
-            android:textSize="16sp"
-            android:textColor="@android:color/black" />
-    </ScrollView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Save JSON Button -->
     <Button
@@ -56,9 +50,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Save JSON"
-        app:layout_constraintTop_toBottomOf="@id/scrollView"
+        app:layout_constraintTop_toBottomOf="@id/speciesInfoTable"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Dark Mode Switch -->
     <Switch
@@ -68,7 +62,7 @@
         android:text="Enable Dark Mode"
         app:layout_constraintTop_toBottomOf="@id/saveButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/fontSizeSeekBar" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Font Size Adjustment SeekBar -->
     <SeekBar
@@ -78,8 +72,9 @@
         android:progress="16"
         android:max="30"
         android:min="12"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/darkModeSwitch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
